@@ -1,3 +1,4 @@
+using Sirenix.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +35,10 @@ namespace Redcode.Extensions
             var popped = new List<T>();
 
             foreach (var index in indexes)
-                popped.Add(list.Pop(index));
+                popped.Add(list[index]);
+
+            foreach (var index in indexes.OrderByDescending(i => i))
+                list.RemoveAt(index);
 
             return popped;
         }
