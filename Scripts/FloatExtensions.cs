@@ -34,7 +34,7 @@ namespace Redcode.Extensions
         /// <returns>The <paramref name="value"/> with a random sign.</returns>
         public static float RandomSign(this float value)
         {
-            return value * Random.Range(0, 1) * 2 - 1;
+            return value * (Random.Range(0, 2) * 2 - 1);
         }
     }
 }
