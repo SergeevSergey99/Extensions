@@ -65,14 +65,26 @@ namespace Redcode.Extensions
         public static (T element, int index) GetRandomElementWithProbability<T>(this IEnumerable<T> enumerable, params float[] probabilities) => GetRandomElementWithProbability(enumerable, (IEnumerable<float>)probabilities);
 
         /// <summary>
+        /// Get random element index with probability selector.
+        /// </summary>
+        /// <typeparam name="T">Enumerable elements type.</typeparam>
+        /// <param name="enumerable">The enumerable.</param>
+        /// <param name="probabilities">Probabilities, must match in count with enumerable.</param>
+        /// <param name="probabilitiesSum">Sum of probabilities.</param>
+        /// <returns>Tuple with random element and it's index.</returns>
+        /// <exception cref="ArgumentException">Throwed when <paramref name="enumerable"/> and <paramref name="probabilities"/> counts are not match.</exception>
+        public static (T element, int index) GetRandomElementWithProbability<T>(this IEnumerable<T> enumerable, double? probabilitiesSum, params float[] probabilities) => GetRandomElementWithProbability(enumerable, (IEnumerable<float>)probabilities, (float)probabilitiesSum);
+
+        /// <summary>
         /// <inheritdoc cref="GetRandomElementWithProbability{T}(IEnumerable{T}, float[])"/>
         /// </summary>
         /// <typeparam name="T"><inheritdoc cref="GetRandomElementWithProbability{T}(IEnumerable{T}, float[])"/></typeparam>
         /// <param name="enumerable"><inheritdoc cref="GetRandomElementWithProbability{T}(IEnumerable{T}, float[])" path="/param[@name='enumerable']"/></param>
         /// <param name="probabilities"><inheritdoc cref="GetRandomElementWithProbability{T}(IEnumerable{T}, float[])" path="/param[@name='probabilities']"/></param>
+        /// <param name="probabilitiesSum">Sum of probabilities.</param>
         /// <returns>Tuple with random element and it's index.</returns>
         /// <exception cref="ArgumentException">Throwed when <paramref name="enumerable"/> and <paramref name="probabilities"/> counts are not match.</exception>
-        public static (T element, int index) GetRandomElementWithProbability<T>(this IEnumerable<T> enumerable, IEnumerable<float> probabilities)
+        public static (T element, int index) GetRandomElementWithProbability<T>(this IEnumerable<T> enumerable, IEnumerable<float> probabilities, float? probabilitiesSum = null)
         {
             var count = enumerable.Count();
 
@@ -82,10 +94,19 @@ namespace Redcode.Extensions
             if (count == 0)
                 throw new ArgumentException($"Enumerable count must be greater than zero");
 
-            var randomValue = UnityRandom.value * probabilities.Sum();
-            var sum = 0f;
+            if (probabilitiesSum == null)
+            {
+                probabilitiesSum = 0f;
 
+                foreach (var element in probabilities)
+                    probabilitiesSum += element;
+            }
+
+            var randomValue = UnityRandom.value * probabilitiesSum.Value;
+
+            var sum = 0f;
             var index = -1;
+
             var enumerator = probabilities.GetEnumerator();
 
             while (enumerator.MoveNext())
@@ -99,7 +120,7 @@ namespace Redcode.Extensions
                     return (enumerable.ElementAt(index), index);
             }
 
-            index = probabilities.Count() - 1;
+            index = count - 1;
             return (enumerable.ElementAt(index), index);
         }
 
@@ -109,11 +130,43 @@ namespace Redcode.Extensions
         /// <typeparam name="T"><inheritdoc cref="GetRandomElementWithProbability{T}(IEnumerable{T}, float[])"/></typeparam>
         /// <param name="enumerable"><inheritdoc cref="GetRandomElementWithProbability{T}(IEnumerable{T}, float[])" path="/param[@name='enumerable']"/></param>
         /// <param name="probabilitySelector">Probabilities selector.</param>
+        /// <param name="probabilitiesSum">Sum of probabilities.</param>
         /// <returns>Tuple with random element and it's index.</returns>
         /// <exception cref="ArgumentException">Throwed when <paramref name="enumerable"/> and <paramref name="probabilities"/> counts are not match.</exception>
-        public static (T element, int index) GetRandomElementWithProbability<T>(this IEnumerable<T> enumerable, Func<T, float> probabilitySelector)
+        public static (T element, int index) GetRandomElementWithProbability<T>(this IEnumerable<T> enumerable, Func<T, float> probabilitySelector, float? probabilitiesSum = null)
         {
-            return GetRandomElementWithProbability(enumerable, enumerable.Select(el => probabilitySelector(el)));
+            var count = enumerable.Count();
+
+            if (count == 0)
+                throw new ArgumentException($"Enumerable count must be greater than zero");
+
+            if (probabilitiesSum == null)
+            {
+                probabilitiesSum = 0f;
+
+                foreach (var element in enumerable)
+                    probabilitiesSum += probabilitySelector(element);
+            }
+
+            var randomValue = UnityRandom.value * probabilitiesSum.Value;
+
+            var sum = 0f;
+            var index = -1;
+
+            var enumerator = enumerable.GetEnumerator();
+
+            while (enumerator.MoveNext())
+            {
+                index += 1;
+                var probability = probabilitySelector(enumerator.Current);
+
+                sum += probability;
+
+                if (randomValue < sum || randomValue.Approximately(sum))
+                    return (enumerator.Current, index);
+            }
+
+            return (enumerator.Current, count - 1);
         }
 
         /// <summary>
