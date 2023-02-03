@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace Redcode.Extensions
@@ -46,5 +47,13 @@ namespace Redcode.Extensions
         {
             return component = gameObject.GetComponentInParent<T>(includeInactive);
         }
+
+        /// <summary>
+        /// Check if game object is in layer mask.
+        /// </summary>
+        /// <param name="gameObject">Target gameobject.</param>
+        /// <param name="layerMask">Layer mask for check.</param>
+        /// <returns><see langword="true"/> if layer mask contain game object's layer.</returns>
+        public static bool IsInLayerMask(this GameObject gameObject, LayerMask layerMask) => ((layerMask.value & (1 << gameObject.layer)) > 0);
     }
 }
