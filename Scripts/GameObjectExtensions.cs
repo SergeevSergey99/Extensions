@@ -55,5 +55,25 @@ namespace Redcode.Extensions
         /// <param name="layerMask">Layer mask for check.</param>
         /// <returns><see langword="true"/> if layer mask contain game object's layer.</returns>
         public static bool IsInLayerMask(this GameObject gameObject, LayerMask layerMask) => ((layerMask.value & (1 << gameObject.layer)) > 0);
+
+        /// <summary>
+        /// Sets layer to all game object hierarchy.
+        /// </summary>
+        /// <param name="gameObject">Target game object.</param>
+        /// <param name="layer">Layer to set.</param>
+        public static void SetLayerRecursive(this GameObject gameObject, string layer) => SetLayerRecursive(gameObject, LayerMask.NameToLayer(layer));
+
+        /// <summary>
+        /// Sets layer to all game object hierarchy.
+        /// </summary>
+        /// <param name="gameObject">Target game object.</param>
+        /// <param name="layer">Layer to set.</param>
+        public static void SetLayerRecursive(this GameObject gameObject, int layer)
+        {
+            gameObject.layer = layer;
+            
+            foreach (Transform child in gameObject.transform.GetChilds())
+                SetLayerRecursive(child.gameObject, layer);
+        }
     }
 }
