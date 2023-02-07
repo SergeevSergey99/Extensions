@@ -57,6 +57,14 @@ namespace Redcode.Extensions
         public static bool IsInLayerMask(this GameObject gameObject, LayerMask layerMask) => ((layerMask.value & (1 << gameObject.layer)) > 0);
 
         /// <summary>
+        /// Check if game object is in layers.
+        /// </summary>
+        /// <param name="gameObject">Target gameobject.</param>
+        /// <param name="layerNames">Layers names for check.</param>
+        /// <returns><see langword="true"/> if game object's layer is in <paramref name="layerNames"/>.</returns>
+        public static bool IsInLayers(this GameObject gameObject, params string[] layerNames) => IsInLayerMask(gameObject, LayerMask.GetMask(layerNames));
+
+        /// <summary>
         /// Sets layer to all game object hierarchy.
         /// </summary>
         /// <param name="gameObject">Target game object.</param>
