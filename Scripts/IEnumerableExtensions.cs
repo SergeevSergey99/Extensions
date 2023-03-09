@@ -22,10 +22,14 @@ namespace Redcode.Extensions
         /// <typeparam name="T">Source type.</typeparam>
         /// <param name="enumerable">The enumerable.</param>
         /// <param name="count">Count of the random elements.</param>
+        /// <param name="clampCount">Does we need clamp <paramref name="count"/> if it greater than <paramref name="enumerable"/> elements count.</param>
         /// <returns>Random elements from enumerable.</returns>
-        public static List<T> GetRandomElements<T>(this IEnumerable<T> enumerable, int count)
+        public static List<T> GetRandomElements<T>(this IEnumerable<T> enumerable, int count, bool clampCount = false)
         {
-            var poppedIndexes = Enumerable.Range(0, enumerable.Count()).ToList().PopRandoms(count).Select(p => p.index);
+            if (clampCount)
+                count = Mathf.Min(count, enumerable.Count());
+
+            var poppedIndexes = Enumerable.Range(0, enumerable.Count()).ToList().PopRandoms(count).Select(p => p.element);
             return enumerable.Where((el, i) => poppedIndexes.Contains(i)).ToList();
         }
 
