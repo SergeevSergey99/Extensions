@@ -184,5 +184,79 @@ namespace Redcode.Extensions
             foreach (var element in enumerable)
                 action(element);
         }
+
+        /// <summary>
+        /// Find object with minimal value by expression.
+        /// </summary>
+        /// <typeparam name="T">Elements type.</typeparam>
+        /// <typeparam name="U"><paramref name="expression"/> result type.</typeparam>
+        /// <param name="enumerable">The enumerable.</param>
+        /// <param name="expression">Expression which used to calculate minimal values.</param>
+        /// <returns>Tuple <see langword="(index, element)"/> with minimal value by expression. If there is no elements, then <see langword="(-1, default)"/> will be returned.</returns>
+        public static (int index, T element) MinBy<T, U>(this IEnumerable<T> enumerable, Func<T, U> expression) where U : IComparable<U>
+        {
+            var enumerator = enumerable.GetEnumerator();
+
+            if (!enumerator.MoveNext())
+                return (-1, default);
+
+            var minIndex = 0;
+            var minObj = enumerator.Current;
+            var minValue = expression(minObj);
+
+            var index = 0;
+
+            while (enumerator.MoveNext())
+            {
+                index += 1;
+                var otherMinValue = expression(enumerator.Current);
+
+                if (otherMinValue.CompareTo(minValue) > -1)
+                    continue;
+
+                minIndex = index;
+                minObj = enumerator.Current;
+                minValue = otherMinValue;
+            }
+
+            return (minIndex, minObj);
+        }
+
+        /// <summary>
+        /// Find object with maximal value by expression.
+        /// </summary>
+        /// <typeparam name="T">Elements type.</typeparam>
+        /// <typeparam name="U"><paramref name="expression"/> result type.</typeparam>
+        /// <param name="enumerable">The enumerable.</param>
+        /// <param name="expression">Expression which used to calculate maximal values.</param>
+        /// <returns>Tuple <see langword="(index, element)"/> with maximal value by expression. If there is no elements, then <see langword="(-1, default)"/> will be returned.</returns>
+        public static (int index, T element) MaxBy<T, U>(this IEnumerable<T> enumerable, Func<T, U> expression) where U : IComparable<U>
+        {
+            var enumerator = enumerable.GetEnumerator();
+
+            if (!enumerator.MoveNext())
+                return (-1, default);
+
+            var maxIndex = 0;
+            var maxObj = enumerator.Current;
+            var maxValue = expression(maxObj);
+
+            var index = 0;
+
+            while (enumerator.MoveNext())
+            {
+                index += 1;
+                var otherMinValue = expression(enumerator.Current);
+
+                if (otherMinValue.CompareTo(maxValue) < 1)
+                    continue;
+
+                maxIndex = index;
+                maxObj = enumerator.Current;
+                maxValue = otherMinValue;
+            }
+
+            return (maxIndex, maxObj);
+        }
     }
 }
