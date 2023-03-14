@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Redcode.Extensions
 {
@@ -499,6 +500,19 @@ namespace Redcode.Extensions
         }
 
         /// <summary>
+        /// Get the closest point on a ray.
+        /// </summary>
+        /// <param name="point">A point in space.</param>
+        /// <param name="origin">Start point of ray.</param>
+        /// <param name="direction">Ray direction. Must be normalized.</param>
+        /// <returns>Tuple which contains closest point on line and distance from <paramref name="origin"/> to calculated point.</returns>
+        public static (Vector3 point, float distance) GetClosestPointOnRay(this Vector3 point, Ray ray)
+        {
+            var distance = Vector3.Dot(point - ray.origin, ray.direction);
+            return (ray.origin + ray.direction * distance, distance);
+        }
+
+        /// <summary>
         /// Get the closest point on a line segment.
         /// </summary>
         /// <param name="point">A point in space.</param>
@@ -514,6 +528,65 @@ namespace Redcode.Extensions
 
             var distance = Mathf.Clamp(Vector3.Dot(point - start, direction), 0f, lineMagnitude);
             return (start + direction * distance, distance);
+        }
+
+        /// <summary>
+        /// Arbitrarily deviates the direction vector by a given <paramref name="angle"/>.
+        /// </summary>
+        /// <param name="direction">Target vector.</param>
+        /// <param name="angle">Angle on which vector will be deflected.</param>
+        /// <returns>Deflected directional vector.</returns>
+        public static Vector3 RandomDeflected(this Vector3 direction, float angle) => RandomDeflected(direction, new Vector2(angle, angle), Vector3.up);
+
+        /// <summary>
+        /// Arbitrarily deviates the direction vector by a given <paramref name="angle"/>, taking into account the <paramref name="up"/> axis.
+        /// </summary>
+        /// <param name="direction">Target vector.</param>
+        /// <param name="angle">Angle on which vector will be deflected.</param>
+        /// <param name="up">Up axis.</param>
+        /// <returns>Deflected directional vector.</returns>
+        public static Vector3 RandomDeflected(this Vector3 direction, float angle, Vector3 up) => RandomDeflected(direction, new Vector2(angle, angle), up);
+
+        /// <summary>
+        /// Arbitrarily deviates the direction vector by a given <paramref name="angleX"/> and <paramref name="angleY"/>.
+        /// </summary>
+        /// <param name="direction">Target vector.</param>
+        /// <param name="angleX">Angle on which vector will be deflected by X axis.</param>
+        /// <param name="angleY">Angle on which vector will be deflected by Y axis.</param>
+        /// <returns>Deflected directional vector.</returns>
+        public static Vector3 RandomDeflected(this Vector3 direction, float angleX, float angleY) => RandomDeflected(direction, new Vector2(angleX, angleY), Vector3.up);
+
+        /// <summary>
+        /// Arbitrarily deviates the direction vector by a given <paramref name="angleX"/> and <paramref name="angleY"/>, taking into account the <paramref name="up"/> axis.
+        /// </summary>
+        /// <param name="direction">Target vector.</param>
+        /// <param name="angleX">Angle on which vector will be deflected by X axis.</param>
+        /// <param name="angleY">Angle on which vector will be deflected by Y axis.</param>
+        /// <param name="up">Up axis.</param>
+        /// <returns>Deflected directional vector.</returns>
+        public static Vector3 RandomDeflected(this Vector3 direction, float angleX, float angleY, Vector3 up) => RandomDeflected(direction, new Vector2(angleX, angleY), up);
+
+        /// <summary>
+        /// Arbitrarily deviates the direction vector by a given <paramref name="angles"/>.
+        /// </summary>
+        /// <param name="direction">Target vector.</param>
+        /// <param name="angles">Angles on which vector will be deflected by X and Y axes.</param>
+        /// <returns>Deflected directional vector.</returns>
+        public static Vector3 RandomDeflected(this Vector3 direction, Vector2 angles) => RandomDeflected(direction, angles, Vector3.up);
+
+        /// <summary>
+        /// Arbitrarily deviates the direction vector by a given <paramref name="angles"/>, taking into account the <paramref name="up"/> axis.
+        /// </summary>
+        /// <param name="direction">Target vector.</param>
+        /// <param name="angles">Angles on which vector will be deflected by X and Y axes.</param>
+        /// <param name="up">Up axis.</param>
+        /// <returns>Deflected directional vector.</returns>
+        public static Vector3 RandomDeflected(this Vector3 direction, Vector2 angles, Vector3 up)
+        {
+            var randomAngles = Random.insideUnitCircle;
+            randomAngles.Scale(angles);
+
+            return Quaternion.LookRotation(direction, up) * Quaternion.Euler(randomAngles.y, randomAngles.x, 0f) * Vector3.forward;
         }
     }
 }
