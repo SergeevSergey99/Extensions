@@ -270,5 +270,13 @@ namespace Redcode.Extensions
             var distance = Mathf.Clamp(Vector2.Dot(point - start, direction), 0f, lineMagnitude);
             return (start + direction * distance, distance);
         }
+
+        /// <summary>
+        /// Arbitrarily deviates the direction vector by a given <paramref name="angle"/>.
+        /// </summary>
+        /// <param name="direction">Target vector.</param>
+        /// <param name="angle">Angle on which vector will be deflected.</param>
+        /// <returns>Deflected directional vector.</returns>
+        public static Vector2 RandomDeflected(this Vector2 direction, float angle) => Quaternion.AngleAxis(Random.value * angle.WithRandomSign(), Vector3.forward) * direction;
     }
 }

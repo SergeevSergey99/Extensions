@@ -24,17 +24,13 @@ namespace Redcode.Extensions
         /// <param name="value">First operand.</param>
         /// <param name="other">Second operand.</param>
         /// <returns><see langword="true"/> if the variables are the same.</returns>
-        public static bool Approximately(this float value, float other) => Mathf.Approximately(value, other);
+        public static bool Approximately(this float value, float other) => Mathf.Approximately(value,
         
-
         /// <summary>
         /// Randomly changes the sign (+ or -) of <paramref name="value"/>.
         /// </summary>
-        /// <param name="value">The value to change.</param>
-        /// <returns>The <paramref name="value"/> with a random sign.</returns>
-        public static float RandomSign(this float value)
-        {
-            return value * (Random.Range(0, 2) * 2 - 1);
-        }
+        /// <param name="value">Target value.</param>
+        /// <returns>Value with randomed sign.</returns>
+        public static float WithRandomSign(this float value) => value * (Random.Range(0, 2) * 2 - 1);
     }
 }

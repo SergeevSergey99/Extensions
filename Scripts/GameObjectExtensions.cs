@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace Redcode.Extensions
@@ -45,6 +46,42 @@ namespace Redcode.Extensions
         public static bool TryGetComponentInParent<T>(this GameObject gameObject, out T component, bool includeInactive = false) where T : Component
         {
             return component = gameObject.GetComponentInParent<T>(includeInactive);
+        }
+
+        /// <summary>
+        /// Check if game object is in layer mask.
+        /// </summary>
+        /// <param name="gameObject">Target gameobject.</param>
+        /// <param name="layerMask">Layer mask for check.</param>
+        /// <returns><see langword="true"/> if layer mask contain game object's layer.</returns>
+        public static bool IsInLayerMask(this GameObject gameObject, LayerMask layerMask) => ((layerMask.value & (1 << gameObject.layer)) > 0);
+
+        /// <summary>
+        /// Check if game object is in layers.
+        /// </summary>
+        /// <param name="gameObject">Target gameobject.</param>
+        /// <param name="layerNames">Layers names for check.</param>
+        /// <returns><see langword="true"/> if game object's layer is in <paramref name="layerNames"/>.</returns>
+        public static bool IsInLayers(this GameObject gameObject, params string[] layerNames) => IsInLayerMask(gameObject, LayerMask.GetMask(layerNames));
+
+        /// <summary>
+        /// Sets layer to all game object hierarchy.
+        /// </summary>
+        /// <param name="gameObject">Target game object.</param>
+        /// <param name="layer">Layer to set.</param>
+        public static void SetLayerRecursive(this GameObject gameObject, string layer) => SetLayerRecursive(gameObject, LayerMask.NameToLayer(layer));
+
+        /// <summary>
+        /// Sets layer to all game object hierarchy.
+        /// </summary>
+        /// <param name="gameObject">Target game object.</param>
+        /// <param name="layer">Layer to set.</param>
+        public static void SetLayerRecursive(this GameObject gameObject, int layer)
+        {
+            gameObject.layer = layer;
+            
+            foreach (Transform child in gameObject.transform.GetChilds())
+                SetLayerRecursive(child.gameObject, layer);
         }
     }
 }
