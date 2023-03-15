@@ -24,7 +24,7 @@ namespace Redcode.Extensions
         /// <param name="value">First operand.</param>
         /// <param name="other">Second operand.</param>
         /// <returns><see langword="true"/> if the variables are the same.</returns>
-        public static bool Approximately(this float value, float other) => Mathf.Approximately(value,
+        public static bool Approximately(this float value, float other) => Mathf.Approximately(value, other);
         
         /// <summary>
         /// Randomly changes the sign (+ or -) of <paramref name="value"/>.
