@@ -463,6 +463,27 @@ namespace Redcode.Extensions
         public static List<Transform> GetChilds(this Transform transform) => transform.Cast<Transform>().ToList();
 
         /// <summary>
+        /// Gets list of all components of target type in childs recursively.
+        /// Works like GetComponentsInChildren but also works in prefab mode.  
+        /// </summary>
+        /// <param name="transform">Target transform.</param>
+        /// <returns>List of all childs.</returns>
+        public static T[] GetAllChildsComponents<T>(this Transform transform) where T : Component
+        {
+            List<T> result = new List<T>();
+            ProcessChild<T>(transform, ref result);
+            return result.ToArray();
+        }
+        private static void ProcessChild<T>(Transform transform, ref List<T> aList) where T : Component
+        {
+            T c = transform.GetComponent<T>();
+            if (c != null)
+                aList.Add(c);
+            foreach(Transform child in transform)
+                ProcessChild<T>(child,ref aList);
+        }
+        
+        /// <summary>
         /// Gets a random child.
         /// </summary>
         /// <param name="transform">Target transform.</param>
