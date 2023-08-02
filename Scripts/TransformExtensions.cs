@@ -474,13 +474,13 @@ namespace Redcode.Extensions
             ProcessChild<T>(transform, ref result);
             return result.ToArray();
         }
-        private static void ProcessChild<T>(Transform transform, ref List<T> aList) where T : Component
+        private static void ProcessChild<T>(Transform transform, ref List<T> result) where T : Component
         {
             T c = transform.GetComponent<T>();
             if (c != null)
-                aList.Add(c);
+                result.Add(c);
             foreach(Transform child in transform)
-                ProcessChild<T>(child,ref aList);
+                ProcessChild<T>(child, ref result);
         }
         
         /// <summary>
